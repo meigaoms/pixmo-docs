@@ -1,5 +1,3 @@
-#Use this file to replace openai.py in package datadreamer/llms/openai.py
-#This file hacks to balance multiple azure endpoints.
 import gc
 import logging
 import sys
@@ -346,7 +344,7 @@ class OpenAI(LLM):
             if optional_kwargs[kw] is not None
         }
         if _is_chat_model(self.model_name):
-            resource = json.load(open("./pipeline/datadreamer/llms/resource.json", "r"))
+            resource = json.load(open("./pipeline/utils/resource.json", "r"))
             endpoints = resource["gpt-4o"]["endpoints"]
             
             def get_generated_texts(self, kwargs, optional_kwargs, prompt) -> list[str]:
