@@ -9,3 +9,7 @@ session_output/
 *.html
 *.pdf
 selected_personas.txt
+pipeline/datadreamer/
+.vscode
+pipeline/utils/resource.json
+OUTPUT*

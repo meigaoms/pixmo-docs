@@ -37,7 +37,7 @@ if __name__ == "__main__":
         "-c",
         "--code_llm",
         type=str,
-        default="claude-sonnet",
+        default="gpt-4o",
         help="LLM to use (gpt-4 or claude-sonnet) for code generation.",
     )
     parser.add_argument(
@@ -104,6 +104,12 @@ if __name__ == "__main__":
         help="whether to generate QA for the visualizations.",
     )
 
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="./OUTPUT/temp/",
+        help="whether to generate QA for the visualizations.",
+    )
     args = parser.parse_args()
 
     print("LLM:", args.llm)

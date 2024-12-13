@@ -22,6 +22,11 @@ from .html_document_pipeline import HTMLDocumentPipeline
 from .graphviz_diagram_pipeline import GraphvizDiagramPipeline
 from .latex_diagram_pipeline import LaTeXDiagramPipeline
 from .mermaid_diagram_pipeline import MermaidDiagramPipeline
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+
+token_provider = get_bearer_token_provider(
+    DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
+)
 
 def run_datadreamer_session(args):
     if args.qa:
@@ -33,15 +38,17 @@ def run_datadreamer_session(args):
         # Load GPT-4
         gpt_4o = OpenAI(
             model_name="gpt-4o",
-            api_key=args.openai_api_key,
+            api_version='2024-08-01-preview',
+            azure_endpoint="https://myresource.openai.azure.com",
+            azure_ad_token_provider=token_provider, #change to use token authorization
             system_prompt="You are a helpful data scientist.",
         )
 
-        gpt_4o_mini = OpenAI(
-            model_name="gpt-4o-mini",
-            api_key=args.openai_api_key,
-            system_prompt="You are a helpful data scientist.",
-        )
+        # gpt_4o_mini = OpenAI(
+        #     model_name="gpt-4o-mini",
+        #     api_key=args.openai_api_key,
+        #     system_prompt="You are a helpful data scientist.",
+        # )
 
         claude_sonnet = CustomAnthropic(
             model_name="claude-3-5-sonnet-20240620",
@@ -77,7 +84,8 @@ def run_datadreamer_session(args):
             for k, v in pipelines.items()
             if v.__name__ in [p.strip() for p in args.pipelines.split(",")]
         }
-
+        print("Pipeline")
+        print(pipelines)
         # Choose how many visualizes per pipeline
         if "," in args.num:
             nums = [int(n.strip()) for n in args.num.strip(",")]
@@ -108,12 +116,15 @@ def run_datadreamer_session(args):
         ]
 
         # Combine results from each pipeline
+        print("Combine")
         scifi_dataset = concat(
             *synthetic_visuals, name="Combine results from all pipelines"
         )
-
         # Preview n rows of the dataset
+        print("Preview")
         print(scifi_dataset.head(n=5))
 
+        scifi_dataset.export_to_hf_dataset(args.output)
+
         # Push to HuggingFace Hub
-        scifi_dataset.publish_to_hf_hub(args.name, private=True)
+        # scifi_dataset.publish_to_hf_hub(args.name, private=True)
